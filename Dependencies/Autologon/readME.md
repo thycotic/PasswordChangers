@@ -30,5 +30,5 @@ This will push the password to an encrypted registry location
 2.1. Click on the Scripts Tab:
     - Leave the box unchecked for "Use Advanced Scripts"
     - Select the Script from the previous steps
-    - Arguments: $[1]$USERNAME $[1]$DOMAIN $[1]$PASSWORD $MACHINE $PASSWORD
+    - Arguments $[1]$USERNAME $[1]$DOMAIN $[1]$PASSWORD $MACHINE $PASSWORD
     - Save
