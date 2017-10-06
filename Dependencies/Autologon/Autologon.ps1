@@ -180,6 +180,16 @@ invoke-command -ComputerName $args[3] -Credential $creds -ArgumentList $args[4] 
 	try 
     {
 		$ErrorActionPreference = "Stop"
+        $WinlogonPath = "HKLM:\Software\Microsoft\Windows NT\CurrentVersion\Winlogon"
+        $insecurePass=Get-ItemProperty -Path $WinlogonPath -Name "DefaultPassword"
+        if($insecurePass.Length -eq 0)
+            {
+                continue
+            }
+        else
+            {
+                Remove-ItemProperty -Path $WinlogonPath -Name "DefaultPassword" -Force
+            }
 		$decryptedPass = [Runtime.InteropServices.Marshal]::PtrToStringAuto([Runtime.InteropServices.Marshal]::SecureStringToBSTR($Password))
 		# Store the password securely.
 		$lsaUtil = New-Object ComputerSystem.LSAutil -ArgumentList "DefaultPassword"
