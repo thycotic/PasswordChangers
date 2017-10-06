@@ -28,7 +28,7 @@ This will push the password to an encrypted registry location
  - Check the box for "Create Template"
 
 2.1. Click on the Scripts Tab:
-    - Leave the box unchecked for "Use Advanced Scripts"
-    - Select the Script from the previous steps
-    - Arguments $[1]$USERNAME $[1]$DOMAIN $[1]$PASSWORD $MACHINE $PASSWORD
-    - Save
+ - Leave the box unchecked for "Use Advanced Scripts"
+ - Select the Script from the previous steps
+ - Arguments $[1]$USERNAME $[1]$DOMAIN $[1]$PASSWORD $MACHINE $PASSWORD
+ - Save
