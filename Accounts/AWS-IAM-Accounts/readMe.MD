@@ -23,7 +23,7 @@ This will change the password for an IAM user using it's own Access Keys. This m
 2. Create the templates:
  - Create a new Secret Template under **Admin** > **Secret Template** and call it **AWS IAM Account**
  - Add the following fields in order: Account, Username, Password, Notes. Make sure you select the correct field types from the drop down menu
- - Create a second tempalate and call it **AWS IAM Access Key**
+ - Create a second template and call it **AWS IAM Access Key**
  - Add the followings fields in order: AccessKey, SecretKey, Username(to help easily identify the keys)
 
 3. Configure the Password Changer: 
