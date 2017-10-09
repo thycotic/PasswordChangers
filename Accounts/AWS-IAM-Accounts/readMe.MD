@@ -10,12 +10,12 @@ This will change the password for an IAM user using it's own Access Keys. This m
 | Operating System | Any Supported |
 | PowerShell | Windows Management Framework 3+ |
 
- ####Prerequisites: 
+ #### Prerequisites: 
 - AWS SDK installed on the Secret Server or Engine Machine
 - Secret Server configured to execute PowerShell scripts
 - Amazon account with IAM access keys
 
- ####Configuration
+ #### Configuration
 
 1. Add AWS-IAM-Password-Changer.ps1 and AWS-IAM-heartbeat.ps1 scripts to Secret Server:
  - **ADMIN** > **Scripts**
