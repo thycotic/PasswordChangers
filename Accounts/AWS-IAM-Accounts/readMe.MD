@@ -14,6 +14,7 @@ This will change the password for an IAM user using it's own Access Keys. This m
 - AWS SDK installed on the Secret Server or Engine Machine
 - Secret Server configured to execute PowerShell scripts
 - Amazon account with IAM access keys
+- Microsoft.mshtml.dll for heartbeat to work (please note that the heartbeat script could break if amazon decided to change the html code)
 
  #### Configuration
 
