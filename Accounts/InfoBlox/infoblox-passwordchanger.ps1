@@ -12,14 +12,14 @@ public class TrustAllCertsPolicy : ICertificatePolicy {
 "@
 [System.Net.ServicePointManager]::CertificatePolicy = New-Object TrustAllCertsPolicy
 #Being Vars
-$privuser=$args[0]
-$privPass= ConvertTo-SecureString -AsPlainText $args[1] -Force
-$creds=New-Object System.Management.Automation.PSCredential -ArgumentList $privuser, $privPass
+$privUserName=$args[0]
+$privPassword= ConvertTo-SecureString -AsPlainText $args[1] -Force
+$creds=New-Object System.Management.Automation.PSCredential -ArgumentList $privUserName, $privPassword
 $url=$args[2]
 $url= $url+"/wapi/v2.6/"
-$username=$args[3]
+$userName=$args[3]
 $filter="adminuser?name="
-$searchUri=$url+$filter+$username
+$searchUri=$url+$filter+$userName   
 
 try {$req=Invoke-RestMethod -Uri $searchUri -Credential $creds}
 
