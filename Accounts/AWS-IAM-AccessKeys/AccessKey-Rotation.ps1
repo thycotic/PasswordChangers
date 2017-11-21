@@ -4,7 +4,7 @@ $SecretKey = $args[1]
 
 #Search For Inactive Keys and delete them
 try{
-$InactiveKeys= Get-IAMAccessKey -AccessKey $AccessKey -SecretKey $SecretKey | Where {$_.Status -match 'Inactive'}
+$InactiveKeys= Get-IAMAccessKey -AccessKey $AccessKey -SecretKey $SecretKey | Where-Object {$_.Status -match 'Inactive'}
 
 if ($InactiveKeys.length -ne 0){
     ForEach($InactiveKey in $InactiveKeys){

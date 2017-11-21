@@ -6,7 +6,7 @@ Set-AWSCredentials -AccessKey $RootAccessKey -SecretKey $RootSecretKey
 
 #Search For Inactive Keys and delete them
 try{
-$InactiveKeys= Get-IAMAccessKey -UserName $IAMUSER | Where {$_.Status -match 'Inactive'}
+$InactiveKeys= Get-IAMAccessKey -UserName $IAMUSER | Where-Object {$_.Status -match 'Inactive'}
 
 if ($InactiveKeys.length -ne 0){
     ForEach($InactiveKey in $InactiveKeys){
