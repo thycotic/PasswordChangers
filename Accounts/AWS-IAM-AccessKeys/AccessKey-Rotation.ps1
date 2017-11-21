@@ -37,8 +37,9 @@ catch [Exception]
     break;
 }
 
-#Set Secret Server API call variables
-$ssUrl = "https://vault"
+#Set Secret Server API call variables. Comment if using integrated authentication
+#region Authentication
+$ssUrl = ""
 $api ="$ssUrl/api/v1"
 $ssUsername = $args[2]
 $ssPassword = $args[3]
@@ -68,12 +69,24 @@ catch{
 
 $headers = New-Object "System.Collections.Generic.Dictionary[[String],[String]]"
 $headers.Add("Authorization", "Bearer $token")
+#endregion
 
-#Pull the Secret From Secret Server
+##### Uncomment if you're using Integrated Authentication #####
+#$winAuthApi="$ssUrl/winauthwebservices/api/v1"
+
+#Pull the Secret From Secret Server. Comment if you're using Integrated Authentication for API
 try
 {
 $getSecret = Invoke-RestMethod -Uri ($api+"/secrets/"+$args[4]) -Headers $headers -Method Get
 }
+
+##### Uncomment below if you're using integrated authentication for API calls. Refer to readme.md for instructions #####
+<#
+try{
+    $getSecret = Invoke-RestMethod -Uri ($winAuthApi+"/secrets/"+$args[4]) -UseDefaultCredentials -Method Get
+    }
+#>
+
 catch{
         $result = $_.Exception.Response.GetResponseStream();
         $reader = New-Object System.IO.StreamReader($result);
@@ -89,11 +102,18 @@ $getSecret.items[1].itemValue = $NewSecretKey
 $arguments = $getSecret | ConvertTo-Json
 
 
-#Push the new keys to Secret Server
+#Push the new keys to Secret Server. Comment if using Integrated Windows Authentication
 try
 {
-$updateSecret = Invoke-RestMethod -Uri ($api+"/secrets/"+$args[4]) -Body $arguments -Method Put -Headers $headers -ContentType "application/json"
+Invoke-RestMethod -Uri ($api+"/secrets/"+$args[4]) -Body $arguments -Method Put -Headers $headers -ContentType "application/json"
 }
+
+#Uncomment below if you're using integrated authentication for API calls. Refer to readme.md for instructions
+<#
+try{
+    Invoke-RestMethod -Uri ($winAuthApi+"/secrets/"+$args[4]) -Body $arguments -Method Put -UseDefaultCredentials -ContentType "application/json"
+    }
+#>
 
 catch{
         $result = $_.Exception.Response.GetResponseStream();
