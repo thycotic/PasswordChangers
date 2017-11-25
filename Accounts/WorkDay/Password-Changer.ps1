@@ -1,4 +1,4 @@
-$loginUrl = "https://wd5.myworkday.com/wday/authgwy/masonicvillages/login.htmld"
+$loginUrl = $args[0]
 #initiate internet explorer object
 $ie = New-Object -ComObject "internetexplorer.application"
 $ie.visible = $true
@@ -11,9 +11,9 @@ $document=$ie.Document
 #get the last form fields that are relevant to password changing
 $fields= $document.getElementsByTagName("input") | Select -Last 4
 #pass the values to the form fields
-$fields[0].value="ali@afalahi.com" #username
-$fields[1].value="password@1" #old password
-$fields[2].value="password@2" #new password
-$fields[3].value="password@2" #verify password
+$fields[0].value=$args[1] #username
+$fields[1].value=$args[2] #old password
+$fields[2].value=$args[3] #new password
+$fields[3].value=$args[4] #verify password
 #submit the password change
 ($document.getElementsByTagName("button") | where {$_.innerText -eq "Submit"}).click();
