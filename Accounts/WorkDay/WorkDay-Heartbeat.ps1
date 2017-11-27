@@ -1,7 +1,7 @@
 $loginUrl = $args[0]
 #initiate internet explorer object
 $ie = New-Object -ComObject "internetexplorer.application"
-$ie.visible = $true
+$ie.visible = $false
 $ie.navigate2($loginUrl)
 #wait untill IE is ready
 while ($ie.Busy -eq $true) { Start-Sleep -Seconds 2; }
