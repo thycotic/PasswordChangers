@@ -32,5 +32,5 @@ return $true
 }
 else{
 $ie.Quit();
-throw "Error heartbeating account"
+throw "Error heartbeating account" + $Error[0].Exception.Message
 }
