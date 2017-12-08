@@ -3,7 +3,7 @@ $password=""
 $loginUrl = ""
 #initiate internet explorer object
 $ie = New-Object -ComObject "internetexplorer.application"
-$ie.visible = $true
+$ie.visible = $false
 $ie.navigate2($loginUrl)
 $document=$ie.Document
 while ($ie.Busy -eq $true) { Start-Sleep -Seconds 1; }
