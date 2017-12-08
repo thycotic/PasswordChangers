@@ -23,6 +23,12 @@ Start-Sleep -Seconds 2;
 #Sign In
 ($document.GetElementById("signInSubmit-input")).click();
 while ($ie.Busy -eq $true) { Start-Sleep -Seconds 2; }
+if($ie.LocationName -eq "AWS Management Console"){
 ($document.GetElementById("aws-console-logout")).click();
-while ($ie.Busy -eq $true) { Start-Sleep -Seconds 2; }
 $ie.Quit();
+return $true
+}
+else{
+$ie.Quit();
+throw "Error heartbeating account"
+}
