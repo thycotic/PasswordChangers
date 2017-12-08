@@ -1,5 +1,7 @@
 $email=""
+$password=""
 $loginUrl = ""
+$newPassword=""
 #initiate internet explorer object
 $ie = New-Object -ComObject "internetexplorer.application"
 $ie.visible = $true
@@ -19,7 +21,7 @@ $fields= $document.GetElementsByTagName("input")
 $fields[0].value=$email
 ($document.getElementsByTagName("button") | where {$_.innerText -eq "Next"}).click();
 Start-Sleep -Seconds 2; 
-($document.GetElementById("ap_password")| select -First 1).value="";
+($document.GetElementById("ap_password")| select -First 1).value=$password;
 #Sign In
 ($document.GetElementById("signInSubmit-input")).click();
 while ($ie.Busy -eq $true) { Start-Sleep -Seconds 1; }
@@ -29,9 +31,9 @@ Start-Sleep -Seconds 2
 while ($ie.Busy -eq $true) { Start-Sleep -Seconds 2; }
 ($document.getElementById("cnep_1A_change_password_button-input")).click();
 while ($ie.Busy -eq $true) { Start-Sleep -Seconds 2;}
-($document.getElementById("ap_password")).value=""
-($document.getElementById("ap_password_new")).value=""
-($document.getElementById("ap_password_new_check")).value=""
+($document.getElementById("ap_password")).value=$password
+($document.getElementById("ap_password_new")).value=$newPassword
+($document.getElementById("ap_password_new_check")).value=$newPassword
 ($document.getElementById("cnep_1D_submit_button-input")).click();
 while ($ie.Busy -eq $true) { Start-Sleep -Seconds 2;}
 ($document.getElementById("cnep_1A_done_button")).click();
