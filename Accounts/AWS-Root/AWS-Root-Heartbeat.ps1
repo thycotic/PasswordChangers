@@ -1,5 +1,5 @@
-$email="afalahi@live.com"
-$loginUrl = "https://console.aws.amazon.com"
+$email=""
+$loginUrl = ""
 #initiate internet explorer object
 $ie = New-Object -ComObject "internetexplorer.application"
 $ie.visible = $true
@@ -19,7 +19,7 @@ $fields= $document.GetElementsByTagName("input")
 $fields[0].value=$email
 ($document.getElementsByTagName("button") | where {$_.innerText -eq "Next"}).click();
 Start-Sleep -Seconds 2; 
-($document.GetElementById("ap_password")| select -First 1).value="mo%/J2xCL*}TMGj3";
+($document.GetElementById("ap_password")| select -First 1).value="";
 #Sign In
 ($document.GetElementById("signInSubmit-input")).click();
 while ($ie.Busy -eq $true) { Start-Sleep -Seconds 2; }
