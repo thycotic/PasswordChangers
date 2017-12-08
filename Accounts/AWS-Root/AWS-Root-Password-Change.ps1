@@ -1,7 +1,7 @@
 $email=""
 $password=""
-$loginUrl = ""
 $newPassword=""
+$loginUrl = ""
 #initiate internet explorer object
 $ie = New-Object -ComObject "internetexplorer.application"
 $ie.visible = $true
@@ -37,7 +37,14 @@ while ($ie.Busy -eq $true) { Start-Sleep -Seconds 2;}
 ($document.getElementById("cnep_1D_submit_button-input")).click();
 while ($ie.Busy -eq $true) { Start-Sleep -Seconds 2;}
 ($document.getElementById("cnep_1A_done_button")).click();
-while ($ie.Busy -eq $true) { Start-Sleep -Seconds 2; }
+Start-Sleep -Seconds 3
+if($ie.LocationName -like "IAM Management Console"){
+$document=$ie.Document
 ($document.GetElementById("aws-console-logout")).click();
-while ($ie.Busy -eq $true) { Start-Sleep -Seconds 2; }
 $ie.Quit();
+return $true
+}
+else{
+$ie.Quit();
+throw "Error changing password" + $Error[0].Exception.Message
+}
