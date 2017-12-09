@@ -27,6 +27,7 @@ Start-Sleep -Seconds 2;
 while ($ie.Busy -eq $true) { Start-Sleep -Seconds 2; }
 if($ie.LocationName -eq "AWS Management Console"){
 ($document.GetElementById("aws-console-logout")).click();
+while ($ie.Busy -eq $true) { Start-Sleep -Seconds 2; }
 $ie.Quit();
 return $true
 }
