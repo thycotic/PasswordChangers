@@ -42,7 +42,6 @@ Start-Sleep -Seconds 5;
 #Sign In
 ($document.GetElementById("signInSubmit-input")).click();
 while ($ie.Busy -eq $true) { Start-Sleep -Seconds 2; }
-Out-File C:\temp\aws.txt
 if($ie.LocationName -eq "AWS Management Console"){
 ($document.GetElementById("aws-console-logout")).click();
 while ($ie.Busy -eq $true) { Start-Sleep -Seconds 2; }
