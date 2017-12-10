@@ -15,14 +15,13 @@ catch
     {
         throw "Error: " + $Error[0].Exception.Message
     }
-
-$email=""
-$password=""
-$loginUrl ="https://signin.aws.amazon.com/signin?client_id=arn%3Aaws%3Aiam%3A%3A015428540659%3Auser%2Fhomepage&redirect_uri=https%3A%2F%2Fconsole.aws.amazon.com%2Fconsole%2Fhome%3Fstate%3DhashArgs%2523%26isauthcode%3Dtrue&page=resolve"
+$email=$args[0]
+$password=$args[1]
+$loginUrl =$args[2]
 #initiate internet explorer object
 $ie = New-Object -ComObject "internetexplorer.application"
-$ie.visible = $true
-$ie.navigate2($loginUrl)
+$ie.visible = $false
+$ie.navigate($loginUrl)
 try
     {
         while ($ie.Busy -eq $true) { Start-Sleep -Seconds 2; }
@@ -37,14 +36,14 @@ try
         #Sign In
         ($document.GetElementById("signInSubmit-input")).click();
         while ($ie.Busy -eq $true) { Start-Sleep -Seconds 2; }
-        if($ie.LocationName -ne "AWS Management Console")
-            {
-                throw "Error heartbeating account"
-            }
-        else
+        if($ie.LocationURL -like "*https://console.aws.amazon.com*")
             {
                 ($document.GetElementById("aws-console-logout")).click();
                 return $true
+            }
+        else
+            {
+                throw "Error Heartbeating account"
             }
     }
 catch
