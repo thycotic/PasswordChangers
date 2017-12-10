@@ -25,6 +25,12 @@ $ie.navigate($loginUrl)
 try
     {
         while ($ie.Busy -eq $true) { Start-Sleep -Seconds 2; }
+        if($ie.LocationURL -like "*awsemail*")
+            {
+                $document=$ie.Document
+                ($document.GetElementById("aws-login-switchaccount-link")).click();
+            }
+        while ($ie.Busy -eq $true) { Start-Sleep -Seconds 2; }
         $document=$ie.Document
         #get the first  form fields that are relevant to sign in
         $document.GetElementById("resolving_input").value=$email
