@@ -179,14 +179,9 @@ invoke-command -ComputerName $args[3] -Credential $creds -ArgumentList $args[4] 
 	#endregion
 	try 
     {
-		$ErrorActionPreference = "Stop"
         $WinlogonPath = "HKLM:\Software\Microsoft\Windows NT\CurrentVersion\Winlogon"
         $insecurePass=Get-ItemProperty -Path $WinlogonPath -Name "DefaultPassword" -ErrorAction SilentlyContinue
-        if($insecurePass.Length -eq 0)
-            {
-                continue
-            }
-        else
+        if($insecurePass.Length -ne 0)
             {
                 Remove-ItemProperty -Path $WinlogonPath -Name "DefaultPassword" -Force
             }
