@@ -27,7 +27,7 @@ This will push the password to IIS configurations for ConnectAs accounts
        - Description: Connect As on %TARGET%
        - Check the box for "Create Template"
    - Click on the Scripts Tab:
-      - Leave the box unchecked for "Use Advanced Scripts"
-      - Select the Script from the previous steps
-      - Arguments $ComputerName $ItemXPath $Domain $UserName $Password
-      - Save
+       - Leave the box unchecked for "Use Advanced Scripts"
+       - Select the Script from the previous steps
+       - Arguments $ComputerName $ItemXPath $Domain $UserName $Password
+       - Save
