@@ -32,7 +32,7 @@ In order for the rotation to work, we will need AWS PowerShell SDK installed on 
   * Field Name= **Trigger**, Type=Text, Not Required
 * Save or click back to finish Creating the template
 
-### Create the Password Changer**
+### Create the Password Changer
 
 * Navigate to Admin > Remote Password Changing > Configure Password Changers > New
 * Call it something relevant, **PowerShell Script** from the drop down menu, Save
@@ -64,7 +64,7 @@ In order for the rotation to work, we will need AWS PowerShell SDK installed on 
   * **Access Key** = **Your Access Key**
   * **Secret Key** = **Your Secret Key**
   * **IAM Username** = **the IAM user for these keys**
-  * **SecretId** = **The SecretId** (put any number, or leave blank) we'll fill it later)
+  * **SecretId** = **The SecretId** (Leave blank on creation. Enter secretId number after you save)
   * **Trigger** = **leave empty**
   * Save
 * Navigate to Remote Password Changing tab on the Secret
