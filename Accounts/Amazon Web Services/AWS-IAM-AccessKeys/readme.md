@@ -42,7 +42,7 @@ In order for the rotation to work, we will need AWS PowerShell SDK installed on 
     * Save
   * Password Change Commands:
     * choose the Access key rotation script from the drop down
-    * Script Args: **$AccessKey $SecretKey $[1]$Username $[1]$Password $Secretid**
+    * Script Args: **$AccessKey $SecretKey $Url $[1]$Username $[1]$Password $Secretid**
       * ***Note***: $[1]$Username $[1]$Password are optional for calling Secret Server's API and used only if you chose the Alternative Method. Read below for explanation
 
 ### Associate Changer with the Template

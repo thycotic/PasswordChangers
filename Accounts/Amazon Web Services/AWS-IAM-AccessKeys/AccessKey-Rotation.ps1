@@ -1,3 +1,19 @@
+<#
+.Synopsis
+   The script will rotate AWS access keys on a scheduled basis with the help of Secret Server
+.DESCRIPTION
+   This cmdlet will take input from Secret Server to connect to AWS and generate new access keys per AWS best practices. The old keys will be set
+   to inactive, new keys will be pushed to Secret Server via api calls. 
+.EXAMPLE
+    Using integrated authentication
+   New-AccessKeys -AccessKey <myaccesskey> -SecretKey <mySecretKey> -AWSUserName <myAwsUser> -SecretId <mySecretID> -Url <mySecretServerUrl>
+.EXAMPLE
+    Using Token Authentication
+   New-AccessKeys -AccessKey <myAwsAccesskey> -SecretKey <myAwsSecretKey> -AWSUserName <myAwsUser> -SecretId <mySecretID> -Url <mySecretServerUrl> -UserName <mySecretServerUser> -Password <mySecretServerPassword>
+.NOTES
+   This cmdlet supports authenticating to Secret Server's API via Windows Integrated Authentication and token authentication. Before using Windows Integrated Authentication you'd have to set it
+   up in IIS. The AWS access key user will need proper permissions to create, update, and delete keys
+#>
 function New-AccessKeys {
     param(
         [CmdletBinding(DefaultParameterSetName="win_auth")]
