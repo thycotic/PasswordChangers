@@ -18,22 +18,23 @@ $url=$args[2]
 $api="/wapi/v2.6/adminuser"
 $filter="?name="+$user
 $uri=$url+$api+$filter
-try {$req=Invoke-RestMethod -Uri $uri -Credential $creds}
-catch [System.Net.WebException]
-{
-Write-Debug "----- Exception -----"
-Write-Debug  $_.Exception
-Write-Debug  $_.Exception.Response.StatusCode
-Write-Debug  $_.Exception.Response.StatusDescription
-$result = $_.Exception.Response.GetResponseStream()
-$reader = New-Object System.IO.StreamReader($result)
-$reader.BaseStream.Position = 0
-$reader.DiscardBufferedData()
-$responseBody = $reader.ReadToEnd()
+try {
+    Invoke-RestMethod -Uri $uri -Credential $creds | Out-Null
 }
-if($responseBody.Length -eq 0)
-{return $true}
-else
-{
+catch [System.Net.WebException] {
+    Write-Debug "----- Exception -----"
+    Write-Debug  $_.Exception
+    Write-Debug  $_.Exception.Response.StatusCode
+    Write-Debug  $_.Exception.Response.StatusDescription
+    $result = $_.Exception.Response.GetResponseStream()
+    $reader = New-Object System.IO.StreamReader($result)
+    $reader.BaseStream.Position = 0
+    $reader.DiscardBufferedData()
+    $responseBody = $reader.ReadToEnd()
+}
+if($responseBody.Length -eq 0) {
+    return $true
+}
+else {
     throw "Heartbeat Failed: "+$responseBody.Error
 }

@@ -21,42 +21,40 @@ $userName=$args[3]
 $filter="adminuser?name="
 $searchUri=$url+$filter+$userName   
 
-try {$req=Invoke-RestMethod -Uri $searchUri -Credential $creds}
-
-
-catch [System.Net.WebException]
-{
-Write-Debug "----- Exception -----"
-Write-Debug  $_.Exception
-Write-Debug  $_.Exception.Response.StatusCode
-Write-Debug  $_.Exception.Response.StatusDescription
-$result = $_.Exception.Response.GetResponseStream()
-$reader = New-Object System.IO.StreamReader($result)
-$reader.BaseStream.Position = 0
-$reader.DiscardBufferedData()
-$responseBody = $reader.ReadToEnd() #| ConvertFrom-Json
-throw  $responseBody.Error +" - " +$responseBody.code
+try {
+    $req=Invoke-RestMethod -Uri $searchUri -Credential $creds
 }
-
+catch [System.Net.WebException] {
+    Write-Debug "----- Exception -----"
+    Write-Debug  $_.Exception
+    Write-Debug  $_.Exception.Response.StatusCode
+    Write-Debug  $_.Exception.Response.StatusDescription
+    $result = $_.Exception.Response.GetResponseStream()
+    $reader = New-Object System.IO.StreamReader($result)
+    $reader.BaseStream.Position = 0
+    $reader.DiscardBufferedData()
+    $responseBody = $reader.ReadToEnd() #| ConvertFrom-Json
+    throw  $responseBody.Error +" - " +$responseBody.code
+}
 $json =@{
-password=$args[4]
+    password=$args[4]
 } | ConvertTo-Json 
 $updateUri=$url+$req._ref
-try{
-$updatePassword=Invoke-RestMethod -Uri $updateUri -Body $json -Method Put -ContentType "application/json" -Credential $creds
+try {
+    Invoke-RestMethod -Uri $updateUri -Body $json -Method Put -ContentType "application/json" -Credential $creds -ErrorAction Stop | Out-Null
 }
-catch [System.Net.WebException]
-{
-Write-Debug "----- Exception -----"
-Write-Debug  $_.Exception
-Write-Debug  $_.Exception.Response.StatusCode
-Write-Debug  $_.Exception.Response.StatusDescription
-$result = $_.Exception.Response.GetResponseStream()
-$reader = New-Object System.IO.StreamReader($result)
-$reader.BaseStream.Position = 0
-$reader.DiscardBufferedData()
-$responseBody = $reader.ReadToEnd() | ConvertFrom-Json
-throw  $responseBody.Error +" - " +$responseBody.code
+catch [System.Net.WebException] {
+    Write-Debug "----- Exception -----"
+    Write-Debug  $_.Exception
+    Write-Debug  $_.Exception.Response.StatusCode
+    Write-Debug  $_.Exception.Response.StatusDescription
+    $result = $_.Exception.Response.GetResponseStream()
+    $reader = New-Object System.IO.StreamReader($result)
+    $reader.BaseStream.Position = 0
+    $reader.DiscardBufferedData()
+    $responseBody = $reader.ReadToEnd() | ConvertFrom-Json
+    throw  $responseBody.Error +" - " +$responseBody.code
 }
-if($responseBody.Error.Length -eq 0)
-{Write-Debug "Password Changed Successfully"}
+if($responseBody.Error.Length -eq 0) {
+    Write-Debug "Password Changed Successfully"
+}
