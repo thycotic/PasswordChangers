@@ -73,6 +73,8 @@ function New-AccessKeys {
                 UseDefaultCredentials=$true
             }
         }
+    }
+    Process {
         #remove any inactive keys
         try {
             Set-AWSCredentials -AccessKey $AccessKey -SecretKey $SecretKey
@@ -89,8 +91,6 @@ function New-AccessKeys {
         catch [Exception] {
             throw "Remove inactive key error: $($_.Exception.Message)"      
         }
-    }
-    Process {
         #Create the keys
         try {
             $newKeys = New-IAMAccessKey -UserName $AWSUserName -ErrorAction Stop
