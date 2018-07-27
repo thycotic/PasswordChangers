@@ -11,25 +11,27 @@ try {
     }
 }
 catch {
-    throw "Error: " + $Error[0].Exception.Message
+    throw "Error loading DLL: $($_.Exception.Message)"
 }
 $account = $args[0]
 $username = $args[1]
 $password = $args[2]
-$loginUrl = "https://$account"+ ".signin.aws.amazon.com/console"
+$loginUrl = "https://${account}.signin.aws.amazon.com/console"
 #initialize browser
 $ie = New-Object -ComObject "internetexplorer.application"
 $ie.visible = $false
 $ie.navigate($loginUrl)
-        
 try {
-    while ($ie.Busy -eq $true) { Start-Sleep -Seconds 1; }    #wait for browser idle
+    #wait for browser idle
+    while ($ie.Busy -eq $true) { 
+        Start-Sleep -Seconds 1; 
+    }
     #login
     $Doc=$ie.Document
-    ($Doc.getElementById("account") | select -First 1).value = $account
-    ($Doc.getElementById("username") | select -First 1).value = $username
-    ($Doc.getElementById("password") | select -First 1).value = $password
-    ($Doc.getElementById("signin_button") | select -first 1).click()
+    ($Doc.getElementById("account") | Select -First 1).value = $account
+    ($Doc.getElementById("username") | Select -First 1).value = $username
+    ($Doc.getElementById("password") | Select -First 1).value = $password
+    ($Doc.getElementById("signin_button") | Select -first 1).click()
     Start-Sleep 5
     if($Doc.getElementById("main_message").textContent -like "*Your authentication information is incorrect*") {
         while($ie.Busy -eq $true) { 
@@ -42,7 +44,7 @@ try {
     }
 }
 catch {
-    throw $Error[0].Exception.Message
+    throw $_.Exception.Message
 }
 Finally {
     $ie.Quit()
