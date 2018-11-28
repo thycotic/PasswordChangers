@@ -1,127 +1,129 @@
-$RootAccessKey= $args[0]
-$RootSecretKey= $args[1]
-$IAMUSER= $args[2]
-$AccessKey= $args[3]
-Set-AWSCredentials -AccessKey $RootAccessKey -SecretKey $RootSecretKey
-
-#Search For Inactive Keys and delete them
-try{
-$InactiveKeys= Get-IAMAccessKey -UserName $IAMUSER | Where-Object {$_.Status -match 'Inactive'}
-
-if ($InactiveKeys.length -ne 0){
-    ForEach($InactiveKey in $InactiveKeys){
-        Remove-IAMAccessKey -AccessKeyId $InactiveKeys.AccessKeyId -Force
-}
-}
-else {
-    Write-Debug "No inactive keys"
-}
-}
-
-catch [Exception]{
-    throw "Remove inactive key error: " + ($Error[0].Exception.Message)
-    break;
-
-}
-#Disabling and creating new keys
-try
-{
-    Update-IAMAccessKey -AccessKeyId $AccessKey -UserName $IAMUSER -Status Inactive
-    $NewKeys = New-IAMAccessKey -UserName $IAMUSER
-    $NewAccessKey = $NewKeys.AccessKeyId
-    $NewSecretKey = $NewKeys.SecretAccessKey
-}
-
-catch [Exception]
-{
-    throw "Create new key error: " + ($Error[0].Exception.Message)
-    break;
-}
-
-#Set Secret Server API call variables. Comment if using integrated authentication
-
-#region Authentication
-$ssUrl = ""
-$api ="$ssUrl/api/v1"
-$ssUsername = $args[4]
-$ssPassword = $args[5]
-$creds = @{
-            username=$ssUsername
-            password=$ssPassword
-            grant_type="password"
-            
-            };
-
-#Authenticate to Secret Server
-try{
-$authenticate= Invoke-RestMethod "$ssURL/oauth2/token" -Method Post -Body $creds
-$token= $authenticate.access_token
-}
-
-catch{
-        $result = $_.Exception.Response.GetResponseStream();
-        $reader = New-Object System.IO.StreamReader($result);
-        $reader.BaseStream.Position = 0;
-        $reader.DiscardBufferedData();
-        $responseBody = $reader.ReadToEnd() | ConvertFrom-Json
-        throw "REST Authentication Error: $($responseBody.errorCode) - $($responseBody.message)"
-        return;
-}
-
-
-$headers = New-Object "System.Collections.Generic.Dictionary[[String],[String]]"
-$headers.Add("Authorization", "Bearer $token")
-#endregion
-
-##### Uncomment below if you're using Integrated Authentication #####
-#$winAuthApi="$ssUrl/winauthwebservices/api/v1"
-
-#Pull the Secret From Secret Server. Comment if you're using Integrated Authentication for API
-try
-{
-$getSecret = Invoke-RestMethod -Uri ($api+"/secrets/"+$args[6]) -Headers $headers -Method Get
-}
-
-##### Uncomment below if you're using integrated authentication for API calls. Refer to readme.md for instructions ####
 <#
-try{
-    $getSecret = Invoke-RestMethod -Uri ($winAuthApi+"/secrets/"+$args[6]) -UseDefaultCredentials -Method Get
-    }
+.Synopsis
+   The script will rotate AWS access keys on a scheduled basis with the help of Secret Server
+.DESCRIPTION
+   This cmdlet will take input from Secret Server to connect to AWS and generate new access keys per AWS best practices. The old keys will be set
+   to inactive, new keys will be pushed to Secret Server via api calls. 
+.EXAMPLE
+    Using integrated authentication
+   New-AccessKeys -AccessKey <myaccesskey> -SecretKey <mySecretKey> -AWSUserName <myAwsUser> -SecretId <mySecretID> -Url <mySecretServerUrl>
+.EXAMPLE
+    Using Token Authentication
+   New-AccessKeys -AccessKey <myAwsAccesskey> -SecretKey <myAwsSecretKey> -AWSUserName <myAwsUser> -SecretId <mySecretID> -Url <mySecretServerUrl> -UserName <mySecretServerUser> -Password <mySecretServerPassword>
+.NOTES
+   This cmdlet supports authenticating to Secret Server's API via Windows Integrated Authentication and token authentication. Before using Windows Integrated Authentication you'd have to set it
+   up in IIS. The AWS access key user will need proper permissions to create, update, and delete keys
 #>
-catch{
-        $result = $_.Exception.Response.GetResponseStream();
-        $reader = New-Object System.IO.StreamReader($result);
-        $reader.BaseStream.Position = 0;
-        $reader.DiscardBufferedData();
-        $responseBody = $reader.ReadToEnd() | ConvertFrom-Json
-        throw "Get Secret Error: $($responseBody.errorCode) - $($responseBody.message)"
-        return;
-}
-#set the old Secret values to the new keys
-$getSecret.items[0].itemValue = $NewAccessKey
-$getSecret.items[1].itemValue = $NewSecretKey
-$arguments = $getSecret | ConvertTo-Json
-
-
-#Push the new keys to Secret Server. Comment if using Integrated Windows Authentication
-try
-{
-Invoke-RestMethod -Uri ($api+"/secrets/"+$args[6]) -Body $arguments -Method Put -Headers $headers -ContentType "application/json"
-}
-
-#Uncomment below if you're using integrated authentication for API calls. Refer to readme.md for instructions
-<#
-try{
-    Invoke-RestMethod -Uri ($winAuthApi+"/secrets/"+$args[6]) -Body $arguments -Method Put -UseDefaultCredentials -ContentType "application/json"
+function New-AccessKeys {
+  param(
+      [CmdletBinding(DefaultParameterSetName="win_auth")]
+      [Parameter(Mandatory=$true)]
+      [string]$RootAccessKey,
+      [Parameter(Mandatory=$true)]
+      [string]$RootSecretKey,
+      [parameter(Mandatory=$true)]
+      [string]$IAMUser,
+      [parameter(Mandatory=$true)]
+      [string]$IAMUserAccessKey,
+      [parameter(Mandatory=$true)]
+      [string]$Url,
+      [parameter(Mandatory=$true)]
+      [string]$SecretId,
+      [parameter(ParameterSetName="win_auth")]
+      [switch]$UseDefaultCredentials,
+      [parameter(Mandatory=$true,ParameterSetName="token_auth")]
+      [string]$UserName,
+      [parameter(Mandatory=$true,ParameterSetName="token_auth")]
+      [string]$Password
+  )
+  Begin{
+    #set SS url and creds
+    if($PSCmdlet.ParameterSetName -eq "token_auth") {
+        $api ="$Url/api/v1/secrets/$SecretId"
+        $creds = @{
+            username = $UserName
+            password = $Password
+            grant_type = "password"
+        }
+        #Authenticate to Secret Server
+        try {
+            $token = (Invoke-RestMethod "$Url/oauth2/token" -Method Post -Body $creds -ErrorAction Stop).access_token
+            $headers = @{Authorization="Bearer $token"}
+            $params = @{
+                Header = $headers
+                Uri = $api
+                ContentType = "application/json"
+            }
+        }
+        catch {
+            throw "Authentication Error $($_.Exception.Message)"
+        }
     }
-#>
-
-catch{
-        $result = $_.Exception.Response.GetResponseStream();
-        $reader = New-Object System.IO.StreamReader($result);
-        $reader.BaseStream.Position = 0;
-        $reader.DiscardBufferedData();
-        $responseBody = $reader.ReadToEnd() | ConvertFrom-Json
-        throw "Update Secret Error: $($responseBody.errorCode) - $($responseBody.message)"
-        return;
+    elseif($PSCmdlet.ParameterSetName -eq "win_auth") {
+        $api="$Url/winauthwebservices/api/v1/secrets/$SecretId"
+        $params = @{
+            Uri = $api
+            ContentType = "application/json"
+            UseDefaultCredentials=$true
+        }
+    }
+  }
+  Process {
+      #remove any inactive keys
+      try {
+          Set-AWSCredentials -AccessKey $RootAccessKey -SecretKey $RootSecretKey
+          $inactiveKeys= @(Get-IAMAccessKey -UserName $IAMUser | Where-Object {$_.Status -match 'Inactive'})
+          if ($inactiveKeys.length -ne 0){
+              $inactiveKeys.foreach({
+                  Remove-IAMAccessKey -UserName $IAMUser -AccessKeyId $_.AccessKeyId -ErrorAction Stop -Force
+              });
+          }
+          else {
+              Write-Debug "No inactive keys"
+          }
+      }
+      catch [Exception] {
+          throw "Remove inactive key error: $($_.Exception.Message)"      
+      }
+      #Create the keys
+      try {
+          $newKeys = New-IAMAccessKey -UserName $IAMUser -ErrorAction Stop
+      }
+      catch {
+          throw "Create key error: $($_.Exception.Message)"
+      }
+      #push the Key to Secret Server
+      try {
+          $getSecret = Invoke-RestMethod -Method Get @params -ErrorAction Stop
+          $getSecret.items[0].itemValue = $($newKeys.AccessKeyId)
+          $getSecret.items[1].itemValue = $($newKeys.SecretAccessKey)
+          $body = $getSecret | ConvertTo-Json
+          Start-Sleep 10
+      }
+      catch {
+          throw "Get secret error $($_.Exception.Message)"
+      }
+      try {
+          Invoke-RestMethod -Method Put -Body $body @params -ErrorAction Stop| Out-Null
+      }
+      catch {
+          #remove the new generated key if there is an error updating the Secret to avoice qouta error
+          Start-Sleep 10
+          Remove-IAMAccessKey -AccessKeyId $newKeys.AccessKeyId -ErrorAction Stop -Force
+          throw "Update secret error $($_.Exception.Message)"
+      }
+      try {
+          #Set the previous access key to inactive
+          Start-Sleep 10
+          Update-IAMAccessKey -UserName $IAMUser -AccessKeyId $IAMUserAccessKey -Status Inactive -ErrorAction Stop
+      }
+      catch {
+          throw "Set key inactive error: $($_.Exception.Message)"
+      }
+  }
 }
+
+New-AccessKeys -RootAccessKey $args[0] -RootSecretKey $args[1] -IAMUser $args[2] -IAMUserAccessKey $args[3] -SecretId  $args[4] -Url "https://SSURL" -UseDefaultCredentials
+#New-AccessKeys -RootAccessKey $args[0] -RootSecretKey $args[1] -IAMUser $args[2] -IAMUserAccessKey $args[3] -SecretId  $args[4] -Url "https://SSURL" -UserName $args[5] -Password $args[6]
+
+# Input Parameters $[2]$AccessKey $[2]$SecretKey $Username $AccessKey $SecretID $[1]$Username $[1]$Password
