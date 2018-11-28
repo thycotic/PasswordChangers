@@ -87,4 +87,4 @@ In order for the rotation to work, we will need AWS PowerShell SDK installed on 
     * Navigate to Admin > Scripts
 
 * The user accounts used for API access will need to have Edit permissions on the Access Key Secret
-* The user account used for API access will also need at least Read permissions on the secret created for its own account.
+* The user account used for API access will also need at least View permissions on the secret created for its own account.
