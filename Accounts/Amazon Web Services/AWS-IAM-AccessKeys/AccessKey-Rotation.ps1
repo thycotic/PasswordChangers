@@ -31,18 +31,10 @@ function New-AccessKeys {
         [switch]$UseDefaultCredentials,
         [parameter(Mandatory=$true,ParameterSetName="token_auth")]
         [string]$UserName,
-        [parameter(Mandatory=$true,ParameterSetName="token_auth")]       
+        [parameter(Mandatory=$true,ParameterSetName="token_auth")]
         [string]$Password
     )
-    Begin {
-        function Write-WebError([string]$Prefix){    
-            $result = $_.Exception.Response.GetResponseStream()
-            $reader = New-Object System.IO.StreamReader($result)
-            $reader.BaseStream.Position = 0
-            $reader.DiscardBufferedData()
-            $responseBody = $reader.ReadToEnd()
-            throw "$($Prefix): $($responseBody)"
-        }
+        Begin{
         #set SS url and creds
         if($PSCmdlet.ParameterSetName -eq "token_auth") {
             $api ="$Url/api/v1/secrets/$SecretId"
@@ -62,7 +54,7 @@ function New-AccessKeys {
                 }
             }
             catch {
-                Write-WebError -Prefix "Authentication Error"
+                throw "Authentication Error $($_.Exception.Message)"
             }
         }
         elseif($PSCmdlet.ParameterSetName -eq "win_auth") {
@@ -104,9 +96,10 @@ function New-AccessKeys {
             $getSecret.items[0].itemValue = $($newKeys.AccessKeyId)
             $getSecret.items[1].itemValue = $($newKeys.SecretAccessKey)
             $body = $getSecret | ConvertTo-Json
+            Start-Sleep 10
         }
         catch {
-            Write-WebError -Prefix "Get secret error"
+            throw "Get secret error $($_.Exception.Message)"
         }
         try {
             Invoke-RestMethod -Method Put -Body $body @params -ErrorAction Stop| Out-Null
@@ -115,7 +108,7 @@ function New-AccessKeys {
             #remove the new generated key if there is an error updating the Secret to avoice qouta error
             Start-Sleep 10
             Remove-IAMAccessKey -AccessKeyId $newKeys.AccessKeyId -ErrorAction Stop -Force
-            Write-WebError -Prefix "Update secret error"
+            throw "Update secret error $($_.Exception.Message)"
         }
         try {
             #Set the previous access key to inactive
@@ -127,3 +120,6 @@ function New-AccessKeys {
         }
     }
 }
+
+New-AccessKeys -AccessKey $args[0] -SecretKey $args[1] -AWSUserName $args[2] -SecretId $args[3] -Url "https://SSURL" -UseDefaultCredentials
+#New-AccessKeys -AccessKey $args[0] -SecretKey $args[1] -AWSUserName $args[2] -SecretId $args[3] -Url "https://SSURL" -UserName $args[4] -Password $args[5]
