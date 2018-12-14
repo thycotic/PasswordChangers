@@ -40,7 +40,7 @@ You need to create and obtain an API Key for an account in OKTA with the followi
 	2. `$[1]$OKTA_API_KEY` - The API key generated to be used to access the APIs.
 	3. `$USERNAME` - The UPN or OKTA login of the user to which the password is to be changed.
 	4. `$PASSWORD` - The OLD password.
-	5. `$NEWPASS` - The NEW password.
+	5. `$NEWPASSWORD` - The NEW password.
 
 ## Templates
 
