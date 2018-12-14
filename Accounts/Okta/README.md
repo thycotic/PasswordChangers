@@ -32,12 +32,12 @@ You need to create and obtain an API Key for an account in OKTA with the followi
 
 * **OKTA-Heartbeat.ps1** - To test the validity of a credential on OKTA.
 	1. `$DOMAIN` - The OKTA domain that is to be contacted (ex: _example.oktapreview.com_)
-	2. `$[1]$OKTA_API_KEY` - The API key generated to be used to access the APIs.
+	2. `$[1]$APIKEY` - The API key generated to be used to access the APIs.
 	3. `$USERNAME` - The UPN or OKTA login of the user to which the password heartbeat is checked against.
 	4. `$PASSWORD` - The password to be checked.
 * **OKTA-PassChange.ps1** - To change the password of a local OKTA account. Will attempt to change other sources, but may not work depending on how the directory or application integration is configured.
 	1. `$DOMAIN` - The OKTA domain that is to be contacted (ex: _example.oktapreview.com_)
-	2. `$[1]$OKTA_API_KEY` - The API key generated to be used to access the APIs.
+	2. `$[1]$APIKEY` - The API key generated to be used to access the APIs.
 	3. `$USERNAME` - The UPN or OKTA login of the user to which the password is to be changed.
 	4. `$PASSWORD` - The OLD password.
 	5. `$NEWPASSWORD` - The NEW password.
