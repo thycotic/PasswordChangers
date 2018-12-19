@@ -92,12 +92,12 @@ $status = ${output}.status
 
 if("${status}" -match "PASSWORD_EXPIRED" -Or "${status}" -match "PASSWORD_RESET" -Or "${status}" -match "PASSWORD_WARN") {
     $return_status = @{ "Status" = "Password Expired"; "stateToken" = "${stateToken}" }
-    Write-Output "${return_status}"
+    Write-Output ${return_status}
     $exit_status = 0
 }
 elseif("${status}" -match "SUCCESS") {
     $return_status = @{ "Status" = "Success"; "stateToken" = "${stateToken}" }
-    Write-Output "${return_status}"
+    Write-Output ${return_status}
     $exit_status = 0
 }
 elseif("${status}" -match "MFA_REQUIRED" -Or "${status}" -match "MFA_ENROLL") {
