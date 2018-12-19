@@ -39,7 +39,8 @@ catch {
 
 try {
     # Use DNS resolution to ensure a valid domain name was entered, fastest and easiest way to check.
-    Resolve-DnsName -Name $DOMAIN -DnsOnly
+    $DNSOutput = Resolve-DnsName -Name ${DOMAIN} -DnsOnly
+    $ResolvedName = ${DNSOutput}.Name[0]
 }
 catch {
     Write-Error "FATAL: Cannot resolve the domain name, please check the domain name parameter. $($PSItem.Execption.GetType())"
@@ -64,7 +65,7 @@ $passes= @{
 $passchange = ${passes} | ConvertTo-Json
 
 # Compile the URL call to query for user information.
-$USERURL = "https://${DOMAIN}:${PORT}/api/v1/users/${USERNAMEURL}"
+$USERURL = "https://${ResolvedName}:${PORT}/api/v1/users/${USERNAMEURL}"
 
 # Add the API key into the authentication header.
 $headers = New-Object "System.Collections.Generic.Dictionary[[String],[String]]"
@@ -74,7 +75,7 @@ try {
     # Query for the user ID with the username, then present the user ID to change the password.
     $userObject = Invoke-RestMethod -Uri ${USERURL} -Method Get -UserAgent 'ThycoticSecretServerPowerShell' -ContentType 'application/json' -Headers ${headers}
     $userID = $userObject.id
-    $changeURL = "https://${DOMAIN}:${PORT}/api/v1/users/${userID}/credentials/change_password"
+    $changeURL = "https://${ResolvedName}:${PORT}/api/v1/users/${userID}/credentials/change_password"
     $changeOutput = Invoke-RestMethod -Uri ${changeURL} -Method Post -Body ${passchange} -UserAgent 'ThycoticSecretServerPowerShell' -ContentType 'application/json' -Headers ${headers}
 }
 catch [System.Net.WebException] {
@@ -124,7 +125,7 @@ $providerName = ${provider}.name
 
 if("${providerName}" -match "OKTA") {
     $return_status = @{ "Status" = "Success"; "stateToken" = "${passwordOutput}" }
-    Write-Output "${return_status}"
+    Write-Output ${return_status}
     $exit_status = 0
 }
 else {

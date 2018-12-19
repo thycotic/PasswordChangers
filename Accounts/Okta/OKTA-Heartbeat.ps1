@@ -15,7 +15,8 @@ $PORT = '443'
 
 try {
     # Use DNS resolution to ensure a valid domain name was entered, fastest and easiest way to check.
-    Resolve-DnsName -Name $DOMAIN -DnsOnly
+    $DNSOutput = Resolve-DnsName -Name ${DOMAIN} -DnsOnly
+    $ResolvedName = ${DNSOutput}.Name[0]
 }
 catch {
     Write-Error "FATAL: Cannot resolve the domain name, please check the domain name parameter. $($PSItem.Execption.GetType())"
@@ -39,7 +40,7 @@ $cred= @{
 $auth = $cred | ConvertTo-Json
 
 # Compile the URL
-$URL = "https://${DOMAIN}:${PORT}/api/v1/authn"
+$URL = "https://${ResolvedName}:${PORT}/api/v1/authn"
 
 # Add the API key into the authentication header.
 $headers = New-Object "System.Collections.Generic.Dictionary[[String],[String]]"
@@ -101,7 +102,7 @@ elseif("${status}" -match "SUCCESS") {
 }
 elseif("${status}" -match "MFA_REQUIRED" -Or "${status}" -match "MFA_ENROLL") {
 $return_status = @{ "Status" = "MFA Required"; "stateToken" = "${stateToken}" }
-    Write-Output "${return_status}"
+    Write-Output ${return_status}
     $exit_status = 0
 }
 else {
