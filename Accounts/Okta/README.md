@@ -2,13 +2,17 @@
 
 ## Prerequisites
 
-You need to create and obtain an API Key for an account in OKTA with the following Administrative permissions:
-* API Access Management (to create/rotate the key for the service account as that service account, can be removed after key is created or rotated)
-* Group w/ access to manage all users (to be able to enumerate all users)
+* Account with PowerShell access on the nodes. (***BUILTIN\Administrators*** or ***BUILTIN\Remote Management Users***)
+* Thycotic Secret Server version 10.5.00000 or higher. (May work on any 10.x version, but tested only on 10.5 and up.)
+* OKTA local account for Thycotic Secret Server to use to access the OKTA API.
+  ***DO NOT*** create an API key as a normal user or your personal account! It should be an access neutral service account with MFA enabled that prevents normal login not through an API except to just create the inital API Key.
+* Obtain an API Key for the above account in OKTA with the following Administrative permissions:
+	* API Access Management (to create/rotate the key for the service account as that service account, can be removed after key is created or rotated)
+	* Group w/ access to manage all users (to be able to enumerate all users)
 
-  ![alt text](docs/Okta-Administrators.png "OKTA Administrators configuration screen.")
+  	![alt text](docs/Okta-Administrators.png "OKTA Administrators configuration screen.")
 
-***DO NOT*** create an API key as a normal user or your personal account! It should be an access neutral service account with MFA enabled that prevents normal login not through an API except to just create the inital API Key.
+* TLS 1.2 enabled on the nodes running the PowerShell scripts.
 
 ## Installation
 
