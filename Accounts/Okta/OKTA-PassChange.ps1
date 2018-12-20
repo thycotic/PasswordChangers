@@ -40,7 +40,12 @@ catch {
 try {
     # Use DNS resolution to ensure a valid domain name was entered, fastest and easiest way to check.
     $DNSOutput = Resolve-DnsName -Name ${DOMAIN} -DnsOnly
-    $ResolvedName = ${DNSOutput}.Name[0]
+    if(${DNSOutput}.Name.GetType().FullName -match "System.String") {
+        $ResolvedName = ${DNSOutput}.Name
+    }
+    else {
+        $ResolvedName = ${DNSOutput}.Name[0]
+    }
 }
 catch {
     Write-Error "FATAL: Cannot resolve the domain name, please check the domain name parameter. $($PSItem.Execption.GetType())"
