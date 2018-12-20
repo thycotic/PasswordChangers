@@ -1,7 +1,6 @@
 ﻿# Set initial status to fail until proven to succeed.
 $exit_status = -1
 
-# TODO: Sanitize these inputs!
 # Transfer variables from call in Secret Server.
 $DOMAIN = $Args[0]
 $OKTA_API_KEY = $Args[1]
@@ -12,6 +11,15 @@ $PORT = '443'
 
 # Uncomment and enter a key manually here if not specifying in the parameters.
 #$OKTA_API_KEY = ''
+
+# Check input validity.
+if(-not ($OKTA_API_KEY -imatch '^[a-z0-9,._-]+$')) {
+    throw [System.ArgumentException]::new("Invalid OKTA API Token provided.",'OKTA_API_KEY');
+}
+
+if(-not ($PORT -gt 0 -and $PORT -le 65535)) {
+    throw [System.ArgumentOutOfRangeException]::new("Port number not in valid range between 1 and 65535 inclusive.",'PORT')
+}
 
 # Sanitize Username by encoding it, as this parameter is suseptible to injection otherwise.
 try {
@@ -54,8 +62,17 @@ catch {
 }
 
 # Set system configuration for secure communications.
-# [System.Net.ServicePointManager]::ServerCertificateValidationCallback = { $True } # DO NOT Validate SSL Cert to trust store. (For Self Signed certs and testing only)
-[Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12; # Require TLS 1.2
+# Uncomment below line to NOT Validate SSL Cert to trust store. (For Self Signed certs and testing only)
+# [System.Net.ServicePointManager]::ServerCertificateValidationCallback = { $True }
+
+# Require TLS 1.2. See: https://help.okta.com/en/prod/Content/Topics/Miscellaneous/okta-ends-browser-support-for-TLS-1.1.htm
+try {
+    [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12;
+}
+catch {
+    # In case administrator has disabled TLS 1.2 in SCHANNEL for some reason.
+    throw [System.Net.ProtocolViolationException]::new("OKTA requires TLS 1.2 to be enabled. Unable to set SecurityProtocol to 'Tls12', please check SCHANNEL configuration.")
+}
 
 # Format hashtable with information to be changed to JSON.
 $passes= @{
